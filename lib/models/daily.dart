@@ -1,4 +1,5 @@
-class Weather {
+class Daily {
+  final int dt;
   final double temp;
   final double feelsLike;
   final double low;
@@ -9,8 +10,9 @@ class Weather {
   final double wind;
   final String icon;
 
-  Weather(
-      {required this.temp,
+  Daily(
+      {required this.dt,
+      required this.temp,
       required this.feelsLike,
       required this.low,
       required this.high,
@@ -20,17 +22,17 @@ class Weather {
       required this.wind,
       required this.icon});
 
-  factory Weather.fromJson(Map<String, dynamic> json) {
-    print(json);
-    return Weather(
-      temp: json['main']['temp'].toDouble(),
-      feelsLike: json['main']['feels_like'].toDouble(),
-      low: json['main']['temp_min'].toDouble(),
-      high: json['main']['temp_max'].toDouble(),
+  factory Daily.fromJson(Map<String, dynamic> json) {
+    return Daily(
+      dt: json['dt'].toInt(),
+      temp: json['temp']['day'].toDouble(),
+      feelsLike: json['feels_like']['day'].toDouble(),
+      low: json['temp']['min'].toDouble(),
+      high: json['temp']['max'].toDouble(),
       description: json['weather'][0]['description'],
-      pressure: json['main']['pressure'].toDouble(),
-      humidity: json['main']['humidity'].toDouble(),
-      wind: json['wind']['speed'].toDouble(),
+      pressure: json['pressure'].toDouble(),
+      humidity: json['humidity'].toDouble(),
+      wind: json['wind_speed'].toDouble(),
       icon: json['weather'][0]['icon'],
     );
   }
