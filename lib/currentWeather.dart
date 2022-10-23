@@ -7,6 +7,7 @@ import 'package:weather_api_app/models/location.dart';
 import 'package:weather_api_app/models/weather.dart';
 import 'package:weather_api_app/extensions.dart';
 import 'package:weather_api_app/auth/secrets.dart';
+import 'package:weather_api_app/models/location_service.dart';
 
 class CurrentWeatherPage extends StatefulWidget {
   final List<Location> locations;
@@ -19,7 +20,7 @@ class CurrentWeatherPage extends StatefulWidget {
 
 class _CurrentWeatherPageState extends State<CurrentWeatherPage> {
   final List<Location> locations;
-  final Location location;
+  Location location;
   Weather? _weather;
 
   _CurrentWeatherPageState(List<Location> locations)
@@ -27,19 +28,39 @@ class _CurrentWeatherPageState extends State<CurrentWeatherPage> {
         this.location = locations[0];
 
   @override
+  void initState() {
+    super.initState();
+    getLocation();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Colors.grey[100],
         body: ListView(children: <Widget>[
-          currentWeatherViews(this.locations, this.location, this.context),
+          currentWeatherViews(this.location, this.context),
           forecastViewsHourly(this.location),
           forecastViewsDaily(this.location),
         ]));
   }
+
+  void getLocation() async {
+    final service = LocationService();
+    final locationData = await service.getLocation();
+
+    if (locationData != null) {
+      setState(() {
+        location = Location(
+            city: "",
+            country: "",
+            lat: locationData.latitude.toString(),
+            lon: locationData.longitude.toString());
+      });
+    }
+  }
 }
 
-Widget currentWeatherViews(
-    List<Location> locations, Location location, BuildContext context) {
+Widget currentWeatherViews(Location location, BuildContext context) {
   Weather? _weather;
   return FutureBuilder(
     builder: (context, snapshot) {
@@ -107,7 +128,7 @@ Widget weatherBox(Weather? _weather) {
     Container(
       padding: const EdgeInsets.all(15),
       margin: const EdgeInsets.all(15),
-      height: 160.0,
+      height: 180,
       decoration: BoxDecoration(
           color: Colors.indigoAccent,
           borderRadius: BorderRadius.all(Radius.circular(20)),
@@ -122,7 +143,7 @@ Widget weatherBox(Weather? _weather) {
     Container(
       padding: const EdgeInsets.all(15),
       margin: const EdgeInsets.all(15),
-      height: 160.0,
+      height: 180,
       decoration:
           BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(20))),
       child: Row(children: [
@@ -352,9 +373,10 @@ Widget dailyBoxes(Forecast? _forecast) {
 
 Future getCurrentWeather(Location location) async {
   Weather weather;
-  String city = location.city;
+  String lat = location.lat;
+  String lon = location.lon;
   var url =
-      "https://api.openweathermap.org/data/2.5/weather?q=$city&appid=$apiKey&units=metric&lang=pl";
+      "https://api.openweathermap.org/data/2.5/weather?lat=$lat&lon=$lon&appid=$apiKey&units=metric&lang=pl";
 
   final response = await http.get(Uri.parse(url));
 
