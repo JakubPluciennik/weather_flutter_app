@@ -142,8 +142,7 @@ Widget weatherBox(Weather? _weather) {
                     ))),
             Container(
                 margin: const EdgeInsets.all(5),
-                child: Text(
-                    "H:${_weather.high.toInt()}° L:${_weather.low.toInt()}°",
+                child: Text(_weather.name,
                     textAlign: TextAlign.left,
                     style: TextStyle(
                       fontWeight: FontWeight.normal,
@@ -300,7 +299,7 @@ Widget hourlyBoxes(Forecast? _forecast) {
                   )
                 ]),
             child: Column(children: [
-              Text("${_forecast.hourly[index].temp}°C",
+              Text("${_forecast.hourly[index].temp.round()}°C",
                   style: TextStyle(
                     fontWeight: FontWeight.w500,
                     fontSize: 17,
