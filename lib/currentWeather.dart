@@ -6,6 +6,7 @@ import 'package:weather_api_app/models/forecast.dart';
 import 'package:weather_api_app/models/location.dart';
 import 'package:weather_api_app/models/weather.dart';
 import 'package:weather_api_app/extensions.dart';
+import 'package:weather_api_app/auth/secrets.dart';
 
 class CurrentWeatherPage extends StatefulWidget {
   final List<Location> locations;
@@ -109,7 +110,14 @@ Widget weatherBox(Weather? _weather) {
       height: 160.0,
       decoration: BoxDecoration(
           color: Colors.indigoAccent,
-          borderRadius: BorderRadius.all(Radius.circular(20))),
+          borderRadius: BorderRadius.all(Radius.circular(20)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.4),
+              spreadRadius: 4,
+              blurRadius: 10,
+            )
+          ]),
     ),
     Container(
       padding: const EdgeInsets.all(15),
@@ -195,7 +203,7 @@ Widget weatherDetailsBox(Weather? _weather) {
               child: Column(
             children: [
               Container(
-                  child: Text("Wind",
+                  child: Text("Wiatr",
                       textAlign: TextAlign.left,
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
@@ -219,7 +227,7 @@ Widget weatherDetailsBox(Weather? _weather) {
               child: Column(
             children: [
               Container(
-                  child: Text("Humidity",
+                  child: Text("Wilgotność",
                       textAlign: TextAlign.left,
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
@@ -243,7 +251,7 @@ Widget weatherDetailsBox(Weather? _weather) {
               child: Column(
             children: [
               Container(
-                  child: Text("Pressure",
+                  child: Text("Ciśnienie",
                       textAlign: TextAlign.left,
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
@@ -312,44 +320,42 @@ Widget hourlyBoxes(Forecast? _forecast) {
 }
 
 Widget dailyBoxes(Forecast? _forecast) {
-  return Expanded(
-    child: ListView.builder(
-        shrinkWrap: true,
-        physics: ClampingScrollPhysics(),
-        padding: const EdgeInsets.only(left: 8, top: 0, bottom: 8, right: 8),
-        itemCount: _forecast!.daily.length,
-        itemBuilder: (BuildContext context, int index) {
-          return Container(
-              padding:
-                  const EdgeInsets.only(left: 10, top: 5, bottom: 5, right: 10),
-              margin: const EdgeInsets.all(5),
-              child: Row(
-                children: [
-                  Expanded(
-                      child: Text(
-                    "${getDateFromTimestamp(_forecast.daily[index].dt)}",
-                    style: TextStyle(fontSize: 14, color: Colors.black),
-                  )),
-                  Expanded(
-                      child: getWeatherIconSmall(_forecast.daily[index].icon)),
-                  Expanded(
-                      child: Text(
-                    "${_forecast.daily[index].high.toInt()}°/${_forecast.daily[index].low.toInt()}°",
-                    textAlign: TextAlign.right,
-                    style: TextStyle(fontSize: 14, color: Colors.grey),
-                  ))
-                ],
-              ));
-        }),
-  );
+  return ListView.builder(
+      shrinkWrap: true,
+      physics: ClampingScrollPhysics(),
+      padding: const EdgeInsets.only(left: 8, top: 0, bottom: 8, right: 8),
+      itemCount: _forecast!.daily.length,
+      itemBuilder: (BuildContext context, int index) {
+        return Container(
+            padding:
+                const EdgeInsets.only(left: 10, top: 5, bottom: 5, right: 10),
+            margin:
+                const EdgeInsets.only(left: 10, top: 5, bottom: 5, right: 10),
+            child: Row(
+              children: [
+                Expanded(
+                    child: Text(
+                  getDateFromTimestamp(_forecast.daily[index].dt),
+                  style: TextStyle(fontSize: 14, color: Colors.black),
+                )),
+                Expanded(
+                    child: getWeatherIconSmall(_forecast.daily[index].icon)),
+                Expanded(
+                    child: Text(
+                  "${_forecast.daily[index].high.toInt()}°/${_forecast.daily[index].low.toInt()}°",
+                  textAlign: TextAlign.right,
+                  style: TextStyle(fontSize: 14, color: Colors.grey),
+                ))
+              ],
+            ));
+      });
 }
 
 Future getCurrentWeather(Location location) async {
   Weather weather;
   String city = location.city;
-  String apiKey = "45bf8c55c52f7d2df2e488cdfeeef4ca";
   var url =
-      "https://api.openweathermap.org/data/2.5/weather?q=$city&appid=$apiKey&units=metric";
+      "https://api.openweathermap.org/data/2.5/weather?q=$city&appid=$apiKey&units=metric&lang=pl";
 
   final response = await http.get(Uri.parse(url));
 
@@ -367,9 +373,8 @@ Future getForecast(Location location) async {
   Forecast forecast;
   String lat = location.lat;
   String lon = location.lon;
-  String apiKey = "45bf8c55c52f7d2df2e488cdfeeef4ca";
   var url =
-      "https://api.openweathermap.org/data/3.0/onecall?lat=$lat&lon=$lon&appid=$apiKey&units=metric";
+      "https://api.openweathermap.org/data/3.0/onecall?lat=$lat&lon=$lon&appid=$apiKey&units=metric&lang=pl";
 
   final response = await http.get(Uri.parse(url));
 
